@@ -1,0 +1,14 @@
+Contatos
+===================
+## <span style="color:brown"> Contatos </span>
+
+**Departamento de Estatística:**<br> 
+- Prof. Dr. Silvano Cesar da Costa: silvano@uel.br. <br>
+- Prof. Dr. Rodrigo Rossetto Pescim: rrpescim@gmail.com; <br>
+- Prof. Dra. Nicole Caldas Pan: nicolepan@uel.br; <br>
+- Prof. Dra. Natalia Albieri Koritiaki: nataliaalbieri@uel.br; <br>
+- Prof. Dra. Mariana Ragassi Urbano: mrurbanouel@gmail.com; <br><br>
+**Departamento de Computação:**<br>
+- Prof. Dr. Sylvio Barbon: barbon@uel.br <br><br>
+**Discentes:**<br>
+- Ms. Gabriel Danilo Shimizu: gabrield.shimizu@gmail.com

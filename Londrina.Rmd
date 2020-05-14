@@ -1,0 +1,325 @@
+Casos Novos em Londrina {data-navmenu="Londrina"}
+=================================================
+
+Row {data-width=400}
+-----------------------------------------------------------------------
+
+### Confirmados {.value-box}
+```{r LONDR1}
+valueBox(
+  value = paste(format(Londrina_Dia$confirmed, decimal.mark=","), "", sep = " "),
+  caption = "Total de Casos Confirmados",
+  color = confirmed_color
+)
+```
+
+### death {.value-box}
+```{r LON2}
+valueBox(
+  value = paste(format(Londrina_Dia$deaths, big.mark=","), " (",
+    round(100 * Londrina_Dia$deaths / Londrina_Dia$confirmed, 1),
+    "%)",
+    sep = ""
+  ),
+  caption = "Número de Óbitos",
+  color = death_color
+)
+```
+
+
+Row
+---------------------------
+### Casos Novos em Londrina
+```{r LON3, echo=F, fig.align='center', fig.height=6, fig.width=14}
+
+Londrina_Datas$date = ymd(Londrina_Datas$date)
+
+Limites_Y = c(0, max(Londrina_Datas$confirmed))
+Ultima_Data = first(Londrina_Datas$date)
+
+# Gráfico de tendência
+Graf_Londrina_Tend = ggplot(Londrina_Datas, aes(date, confirmed, label=confirmed)) +
+  geom_point(size=3.5, col='red') +
+  geom_line(lwd=1, col='black') +
+  scale_x_date(name='Datas',
+               date_labels="%d %b", date_minor_breaks="1 day",
+               breaks = seq(as.Date("2020-03-17"),
+                            as.Date(max(Londrina_Datas$date)),
+                            by="7 days")) +
+  scale_y_continuous(name='Número de Casos', limits=Limites_Y, n.breaks=6) +
+  geom_text_repel(nudge_y=0, nudge_x=1.2, segment.size=0.1) +
+  theme(text=element_text(size=20),
+        axis.line=element_line(colour, size=1.2, linetype='solid',
+                               color='darkblue'),
+        axis.text.x=element_text(color="darkblue", face='bold', size=12,
+                                 angle=0, hjust=.5, vjust=.5),
+        axis.text.y=element_text(color="darkblue", face='bold', size=12,
+                                 angle=0, hjust=1, vjust=0),
+        axis.title.x=element_text(color="black", face='bold', size=16,
+                                  angle=0, hjust=.5, vjust=0),
+        axis.title.y=element_text(color="black", face='bold', size=16,
+                                  angle=90, hjust=.5, vjust=.5)) +
+  geom_label(label="Número de Casos em Londrina",
+             x=as.Date('2020-04-07'), y=max(Londrina_Datas$confirmed), size=5,
+             label.padding=unit(1.25, "lines"),
+             label.size=1,
+             color = "black",
+             fill="lightyellow")
+
+#--------------------------------------
+# Gráfico dos Novos Casos em Londrina -
+#--------------------------------------
+Londrina_Datas$Novos = c(-diff(Londrina_Datas$confirmed), 0)
+
+Limites_Y_n = c(0, max(Londrina_Datas$Novos))
+
+Graf_NC_Londrina = ggplot(Londrina_Datas, aes(date, Novos, label=Novos)) +
+  geom_point(size=3.5, col='red') +
+  geom_line(lwd=1.2, col='black') +
+  scale_x_date(name='Datas',
+               date_labels="%d %b", date_minor_breaks="1 day",
+               breaks = seq(as.Date("2020-03-17"),
+                            as.Date(max(Londrina_Datas$date)),
+                             by="7 days")) +
+  scale_y_continuous(name='Casos Novos', limits=Limites_Y_n, n.breaks=6) +
+  geom_text_repel(nudge_y=0, nudge_x=.3, segment.size=0.1) +
+  theme(text=element_text(size=20),
+        axis.line=element_line(colour, size=1.2, linetype='solid', color='darkblue'),
+        axis.text.x=element_text(color="darkblue", face='bold', size=12, angle=0, hjust=.5, vjust=.5),
+        axis.text.y=element_text(color="darkblue", face='bold', size=12, angle=0, hjust=1, vjust=0),
+        axis.title.x=element_text(color="black", face='bold', size=16, angle=0, hjust=.5, vjust=0),
+        axis.title.y=element_text(color="black", face='bold', size=16, angle= 90, hjust=.5, vjust=.5)) +
+  geom_label(label="Número de Casos Novos \n em Londrina",
+             x=as.Date('2020-04-28'), y=max(Londrina_Datas$Novos), size=5,
+             label.padding=unit(1.25, "lines"),
+             label.size=1,
+             color = "black",
+             fill="lightyellow")
+# Graf_NC_Londrina
+
+library(ggpubr)
+ggarrange(Graf_Londrina_Tend, Graf_NC_Londrina,
+          ncol = 2, nrow = 1)
+```
+
+
+
+Gráfico Interativo: Londrina {data-navmenu="Londrina"}
+======================================================
+```{r LON4, echo=F}
+#----------------------------------------------------------
+# Número de casos em Londrina (gráfico dash - Interativo) -
+#----------------------------------------------------------
+Londrina_Datas[is.na(Londrina_Datas)] <- 0
+
+LDN_datas <- Londrina_Datas %>%
+  select(date, confirmed, deaths) %>%
+  group_by(date) %>%
+  summarise(Confirmados = sum(confirmed, na.rm = TRUE),
+  Obitos = sum(deaths, na.rm = TRUE))
+
+plot_ly(data = LDN_datas) %>%
+  add_trace(x = ~ date,
+            y = ~ Confirmados,
+            type = "scatter",
+            mode = "lines+markers",
+            name = "Confirmados",
+            line = list(color = active_color),
+            marker = list(color = active_color)) %>%
+  add_trace(x = ~ date,
+            y = ~ Obitos,
+            type = "scatter",
+            mode = 'lines+markers',
+            name = "Óbitos",
+            line = list(color = death_color),
+            marker = list(color = death_color)) %>%
+  layout(title = "",
+         yaxis = list(title = "Número de Casos em Londrina"),
+         xaxis = list(title = "Datas",
+                      type = 'date',
+                      tickformat = "%d %b"),
+         legend = list(x = 0.1, y = 0.9),
+         hovermode = "compare")
+```
+
+
+
+Gráfico de Área: Londrina {data-navmenu="Londrina"}
+===================================================
+```{r LON5, echo=F}
+# Gráfico do Número de Casos Acumulados: Londrina
+plot_ly(LDN_datas,
+        x = ~date,
+        y = ~Confirmados, name = 'Confirmados',
+        type = 'scatter', mode = 'none',
+        stackgroup = 'one', fillcolor = "#1f77b4") %>%
+  add_trace(y = ~Obitos, name = "Óbitos", fillcolor = "red") %>%
+  layout(title = "",
+         xaxis = list(title = "Datas",
+                      type = 'date',
+                      tickformat = "%d %b",
+                      showgrid = FALSE),
+         yaxis = list(title = "Total de Casos em Londrina",
+                      showgrid = FALSE),
+         legend = list(x = 0.1, y = 0.9),
+         hovermode = "compare")
+```
+
+
+
+Comparando as Cidades {data-navmenu="Londrina"}
+===============================================
+Row
+------------------------------------
+### Comparando Cidades
+```{r LON6, echo=F, fig.align='center', fig.height=6, fig.width=14}
+# parana_datas = read.csv('c:/Corona/Dados/MS/Parana_Datas_Cidades.csv',
+#                        encoding="UTF-8", na.strings=0)
+# Parana_Datas = parana_datas
+
+Parana_Cidades_Datas[is.na(Parana_Cidades_Datas)] <- 0
+
+type <- if_else(Parana_Cidades_Datas$deaths==0, "confirmado", "death")
+
+PR1 = dplyr::mutate(Parana_Cidades_Datas, type)
+PR1$date = as.Date(PR1$date)
+
+Data_Londrina = PR1[PR1$city=="Londrina", ]
+Data_Curitiba = PR1[PR1$city=="Curitiba", ]
+Data_Maringa = PR1[PR1$city=="Maringá", ]
+Data_Cascavel = PR1[PR1$city=="Cascavel", ]
+
+# Construindo o gráfico
+  plot_ly() %>%
+    add_trace(x = ~ date,
+              y = ~ confirmed,
+              data=Data_Londrina,
+              type = "scatter",
+              name = "Londrina",
+              mode = "lines+markers",
+              line = list(width=4),
+              marker = list(size=10)) %>%
+    add_trace(x = ~ date,
+              y = ~ confirmed,
+              data=Data_Curitiba,
+              type = "scatter",
+              name = "Curitiba",
+              mode = "lines+markers",
+              line = list(width=4),
+              marker = list(size=10)) %>%
+    add_trace(x = ~ date,
+              y = ~ confirmed,
+              data=Data_Maringa,
+              type = "scatter",
+              name = "Maringá",
+              mode = "lines+markers",
+              line = list(width=4),
+              marker = list(size=10)) %>%
+    add_trace(x = ~ date,
+              y = ~ confirmed,
+              data=Data_Cascavel,
+              type = "scatter",
+              name = "Cascavel",
+              mode = "lines+markers",
+              line = list(width=4),
+              marker = list(size=10)) %>%
+    layout(title = "Casos Confirmados",
+           legend = list(x = 0.1, y = 0.9),
+           yaxis = list(title = "Número de Casos por Dia"),
+           xaxis = list(title = "Datas",
+                        type = 'date',
+                        tickformat = "%d %b"),
+           hovermode = "compare",
+           margin <- list(autoexpand = FALSE,
+              l = 100,
+              r = 100,
+              t = 110))
+```
+
+
+
+Casos por Bairros {data-navmenu="Londrina"}
+======================================================
+```{r LONBAIR, echo=F}
+# Convertendo dados em Latitude e Longitude
+# Coordenadas em UTM importadas contendo duas colunas, X e Y
+dataUTM = CovidLondrina[ , 2:3]
+colnames(dataUTM) = c("X","Y")
+
+# A função solicita que seja feitas duas coisas com os dados:
+# especificar para os dados a zona e a projeção, neste caso 22 e UTM.
+attr(dataUTM, "zone") <- 22
+attr(dataUTM, "projection") <- "UTM"
+
+# Agora convertendo de UTM para lat/long
+# use "km=F" caso as coordenadas UTM estejam em metros e
+# "southern=T" sendo no hemisfério sul.
+dataLL <- convUL(dataUTM, km=F, southern=T)
+CovidLondrina$Longitude = dataLL$X
+CovidLondrina$Latitude = dataLL$Y
+
+# Convertendo shp em LAT/LONG
+# projection(LON)
+LON <- spTransform(LON, CRS("+proj=longlat +init=epsg:4326 +ellps=WGS84 +datum=WGS84 +no_defs"))
+
+# projection(LON)
+
+p <- SpatialPointsDataFrame(coords = CovidLondrina[ , c(2,3)],
+                            data=CovidLondrina,
+                            proj4string = CRS("+proj=longlat +datum=WGS84
+                                              +ellps=WGS84 +towgs84=0,0,0"))
+poly.counts(p, LON) -> res
+
+LON@data$confirmados = setNames(res, LON@data$região)
+
+BRANCO = ifelse(LON@data$confirmados==0, NA, LON@data$confirmados)
+pal <- colorBin(colortools::wheel("steelblue", num=4, border='red'),
+                 domain=BRANCO, na.color='white', bins=17, 
+                reverse=TRUE)
+# 
+# pal <- colorBin("Oranges", domain=BRANCO, na.color="white")
+# pal <- colorNumeric("Oranges", domain=BRANCO, na.color="white")
+
+state_popup <- paste0("<strong> Bairro: </strong>",
+                      LON$bairros,
+                      "<br><strong> Confirmados: </strong>",
+                      LON@data$confirmados) %>%
+  lapply(htmltools::HTML)
+
+LON_Disse = leaflet(LON, width=500, height=500) %>%
+  addProviderTiles("CartoDB.Positron") %>%
+  addPolygons(data=LON,
+              fillColor=~pal(BRANCO),  # Não estou usando os dados
+              fillOpacity = 2.5,
+              color = "black",
+              weight = 1,
+              label = state_popup,
+              labelOptions = labelOptions(direction='auto', textsize=16)) %>%
+  addLegend("topright", pal=pal, values=~LON@data$confirmados, 
+            title="Casos Confirmados", opacity=1)
+
+LON_Dis <- addControlGPS(LON_Disse, options=gpsOptions(position="center", activate=TRUE, autoCenter=TRUE, maxZoom=5, setView = TRUE))
+
+activateGPS(LON_Dis)
+```
+
+
+
+<!-- Casos por Região {data-navmenu="Londrina"} -->
+<!-- ====================================================== -->
+<!-- ```{r LONREG, echo=F} -->
+<!-- p <- SpatialPointsDataFrame(coords = CovidLondrina[,c(2,3)],  -->
+<!--                             data = CovidLondrina, -->
+<!--                             proj4string = CRS("+proj=longlat +datum=WGS84 -->
+<!--                                               +ellps=WGS84 +towgs84=0,0,0")) -->
+
+<!-- poly.counts(p, LON) -> res -->
+<!-- setNames(res, LON@data$região) -->
+
+<!-- cores = topo.colors(30)[res] -->
+
+<!-- plot(LON, col=cores) -->
+<!-- plot(p, col="red" , add=TRUE) -->
+
+<!-- legend("topleft",legend=res, fill=cores) -->
+<!-- ``` -->

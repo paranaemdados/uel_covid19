@@ -1,0 +1,145 @@
+---
+title: "Covid-19"
+fontsize: 18pt
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+#    source_code: embed
+#    orientation: columns
+#    vertical_layout: scroll
+---
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-163778969-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-163778969-1');
+</script>
+
+
+<style type="text/css">
+  
+h1 {color: red; 
+    text-align: justify;
+    font-size: 35px;}
+
+body, td, caption{font-size: 25px;
+                  text-align: justify;
+                  background-color: lightyellow;
+                  margin-right: 5%;
+                  margin-left: 5%
+                  }
+body {
+    !margin: auto;
+    !width: 1200px;
+}
+
+.center_div {
+  border: 4px solid gray;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  background-color: lightblue;
+  padding: 8px;
+  color: red;
+  text-align: justify;
+}
+
+</style>
+  
+<br>
+
+```{r pacotes, include=FALSE}
+options(big.mark='.', decimal.mark=',')
+
+#-----------------
+# Pacotes usados -
+#-----------------
+require(data.table)
+require(dplyr)
+library(DT)
+library(flexdashboard)
+require(ggplot2)
+library(ggpubr)
+library(ggrepel)
+library(GISTools)
+require(htmltools)
+require(knitr)
+require(leaflet)
+library(leaflet.extras)
+require(lubridate)
+library(PBSmapping)
+require(plotly)
+require(RColorBrewer)
+require(readxl)
+require(rgdal)
+require(stringr)
+```
+
+```{r Cores, include=FALSE}
+#-----------------------------------------------
+# https://www.w3.org/TR/css-color-3/#svg-color -
+#-----------------------------------------------
+#
+#------------------
+# Definindo cores -
+#------------------
+# display.brewer.all()
+
+cor_confirmado <- "lightblue"
+cor_obito <- "red"
+cor_ativo <- "silver"
+cor_opcao <- "forestgreen"
+
+confirmed_color <- "purple"
+active_color <- "#1f77b4"
+recovered_color <- "forestgreen"
+death_color <- "red"
+```
+
+```{r, child=c('Dados_CSV.Rmd', 'Dados_GEOREF.Rmd', 'Dados.Rmd')}
+```
+
+```{r, echo=F, include=FALSE, warning=FALSE}
+conta = Parana_Dia %>%
+  filter(city != "Importados/Indefinidos") %>%
+  filter(confirmed!=0)
+mun_casos = with(conta, ifelse(confirmed=='0', 'Não', 'Sim'))
+(mun_com_casos = as.numeric(table(mun_casos)))
+(mun_sem_casos = 399 - mun_com_casos)
+
+mun_mortes = conta %>%
+  filter(deaths != 0)
+(mun_com_mortes = length(mun_mortes$deaths))
+```
+
+
+
+```{r, child=c('Introdução.Rmd')}
+```
+
+```{r, child=c('Resumo.Rmd')}
+```
+
+```{r, child=c('Governadores.Rmd')}
+```
+
+<!-- ```{r, child=c('HU.Rmd')} -->
+<!-- ``` -->
+
+```{r, child=c('Regional_17.Rmd')}
+```
+
+```{r, child=c('Londrina.Rmd')}
+```
+
+```{r, child=c('PARANÁ.Rmd')}
+```
+
+```{r, child=c('BRASIL.Rmd')}
+```
+
+```{r, child=c('Contatos.Rmd')}
+```

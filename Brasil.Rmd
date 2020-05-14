@@ -1,0 +1,342 @@
+Casos Confirmados no Brasil {data-navmenu="Brasil"}
+==========================================
+```{r BR1CC, echo=F, fig.align='center', fig.height=6, fig.width=14, warning=FALSE}
+
+BR_Datas <- Brasil_Datas %>%
+  select(date, state, confirmed, deaths) %>%
+  group_by(date) %>%
+  summarise(Confirmados=sum(confirmed, na.rm=TRUE),
+            Obitos=sum(deaths, na.rm=TRUE))
+
+BR_Datas1 = data.frame(BR_Datas)
+BR_Datas1$date = ymd(BR_Datas1$date)   # Convertendo para datas
+
+y_lim = c(0, max(BR_Datas1$Confirmados/1000))
+
+ggplot(BR_Datas1, aes(date, Confirmados/1000, label=Confirmados)) +
+  geom_point(size=3.5, col='red') +
+  geom_line(lwd=1, col='black') +
+  scale_x_date(name='Datas',
+               date_labels="%d %b", date_minor_breaks="1 day",
+               breaks = seq(as.Date("2020-02-25"), 
+                            as.Date(max(BR_Datas1$date)), 
+                            by="5 days")) +             
+  scale_y_continuous(name='Número de Casos ( x 1.000)',
+                     limits=y_lim, n.breaks=10) +
+  geom_text_repel(nudge_y=0, nudge_x=1.2, segment.size=0.1) +
+  theme(text=element_text(size=20),
+        axis.line=element_line(colour, size=1.2, linetype='solid', color='darkblue'),
+        axis.text.x=element_text(color="darkblue", face='bold', size=12, angle=0, hjust=.5, vjust=.5),
+        axis.text.y=element_text(color="darkblue", face='bold', size=12, angle=0, hjust=1, vjust=0),
+        axis.title.x=element_text(color="black", face='bold', size=16, angle=0, hjust=.5, vjust=0),
+        axis.title.y=element_text(color="black", face='bold', size=16, angle= 90, hjust=.5, vjust=.5)) +
+    geom_label(label="Número Casos Confirmados no Brasil",
+             x=as.Date('2020-03-22'), y=max(BR_Datas1$Confirmados/1000), size=5,
+             label.padding=unit(1.25, "lines"),
+             label.size=1,
+             color = "black",
+             fill="lightyellow")
+```
+
+
+Novos Casos no Brasil {data-navmenu="Brasil"}
+=============================================
+```{r BR1NC, echo=F, fig.align='center', fig.height=6, fig.width=14, warning=FALSE}
+
+BR_Datas1$Novos = c(0, diff(BR_Datas1$Confirmados))
+BR_Datas1$date = ymd(BR_Datas1$date)
+
+Limites_Y_n = c(0, max(BR_Datas1$Novos))
+
+ggplot(BR_Datas1, aes(date, Novos, label=Novos)) +
+  geom_point(size=3.5, col='red') +
+  geom_line(lwd=1.2, col='black') +
+  scale_x_date(name='Datas',
+               date_labels="%d %b", date_minor_breaks="1 day",
+               breaks = seq(as.Date("2020-02-25"), 
+                            as.Date(max(BR_Datas1$date)), 
+                            by="5 days")) +
+  scale_y_continuous(name='Casos Novos', 
+                     limits=Limites_Y_n, n.breaks=6) +
+  geom_text_repel(nudge_y=0, nudge_x=.3, segment.size=0.1) +
+  theme(text=element_text(size=20),
+        axis.line=element_line(colour, size=1.2, linetype='solid',
+                               color='darkblue'),
+        axis.text.x=element_text(color="darkblue", face='bold', size=12,
+                                 angle=0, hjust=.5, vjust=.5),
+        axis.text.y=element_text(color="darkblue", face='bold', size=12,
+                                 angle=0, hjust=1, vjust=0),
+        axis.title.x=element_text(color="black", face='bold', size=16,
+                                  angle=0, hjust=.5, vjust=0),
+        axis.title.y=element_text(color="black", face='bold', size=16,
+                                  angle= 90, hjust=.5, vjust=.5)) +
+  geom_label(label="Número de Casos Novos no Brasil",
+             x=as.Date('2020-03-22'), 
+             y=max(BR_Datas1$Novos), 
+             size=5,
+             label.padding=unit(1.25, "lines"),
+             label.size=1,
+             color = "black",
+             fill="lightyellow")
+```
+
+
+Óbitos no Brasil {data-navmenu="Brasil"}
+==========================================
+```{r BR2O, echo=F, fig.align='center', fig.height=6, fig.width=14, warning=FALSE}
+
+BR_Obitos = data.frame(BR_Datas)
+BR_Obitos$date = ymd(BR_Obitos$date)   # Convertendo para datas
+
+y_lim = c(0, max(BR_Obitos$Obitos))
+
+ggplot(BR_Obitos, aes(date, Obitos, label=Obitos)) +
+  geom_point(size=3.5, col='red') +
+  geom_line(lwd=1, col='black') +
+  scale_x_date(name='Datas',
+               date_labels="%d %b", date_minor_breaks="1 day",
+               breaks = seq(as.Date("2020-02-25"), 
+                            as.Date(max(BR_Obitos$date)), 
+                            by="5 days")) +             
+  scale_y_continuous(name='Número de Óbitos',
+                     limits=y_lim, n.breaks=10) +
+  geom_text_repel(nudge_y=0, nudge_x=1.2, segment.size=0.1) +
+  theme(text=element_text(size=20),
+        axis.line=element_line(colour, size=1.2, linetype='solid', color='darkblue'),
+        axis.text.x=element_text(color="darkblue", face='bold', size=12, angle=0, hjust=.5, vjust=.5),
+        axis.text.y=element_text(color="darkblue", face='bold', size=12, angle=0, hjust=1, vjust=0),
+        axis.title.x=element_text(color="black", face='bold', size=16, angle=0, hjust=.5, vjust=0),
+        axis.title.y=element_text(color="black", face='bold', size=16, angle= 90, hjust=.5, vjust=.5)) +
+  geom_label(label="Curva de Óbitos Acumulados no Brasil",
+             x=as.Date('2020-03-22'), 
+             y=max(BR_Obitos$Obitos), 
+             size=5,
+             label.padding=unit(1.25, "lines"),
+             label.size=1,
+             color = "black",
+             fill="lightyellow")
+```
+
+
+Óbitos Diários no Brasil {data-navmenu="Brasil"}
+=============================================
+```{r BR2NO, echo=F, fig.align='center', fig.height=6, fig.width=14, warning=FALSE}
+
+BR_Obitos$Obitos_Novos = c(0, diff(BR_Obitos$Obitos))
+BR_Obitos$date = ymd(BR_Obitos$date)
+
+Limites_Y_n = c(0, max(BR_Obitos$Obitos_Novos))
+
+BR_Obitos = data.frame(BR_Obitos)
+
+ggplot(BR_Obitos, aes(date, Obitos_Novos, label=Obitos_Novos)) +
+  geom_point(size=3.5, col='red') +
+  geom_line(lwd=1.2, col='black') +
+  scale_x_date(name='Datas',
+               date_labels="%d %b", date_minor_breaks="1 day",
+               breaks = seq(as.Date("2020-02-25"), 
+                            as.Date(max(BR_Obitos$date)), 
+                            by="5 days")) +
+  scale_y_continuous(name='Óbitos Diários', 
+                     limits=Limites_Y_n, n.breaks=6) +
+  geom_text_repel(nudge_y=0, nudge_x=.3, segment.size=0.1) +
+  theme(text=element_text(size=20),
+        axis.line=element_line(colour, size=1.2, linetype='solid',
+                               color='darkblue'),
+        axis.text.x=element_text(color="darkblue", face='bold', size=12,
+                                 angle=0, hjust=.5, vjust=.5),
+        axis.text.y=element_text(color="darkblue", face='bold', size=12,
+                                 angle=0, hjust=1, vjust=0),
+        axis.title.x=element_text(color="black", face='bold', size=16,
+                                  angle=0, hjust=.5, vjust=0),
+        axis.title.y=element_text(color="black", face='bold', size=16,
+                                  angle= 90, hjust=.5, vjust=.5)) +
+  geom_label(label="Óbitos Diários no Brasil",
+             x=as.Date('2020-03-22'), 
+             y=max(BR_Obitos$Obitos_Novos), 
+             size=5,
+             label.padding=unit(1.25, "lines"),
+             label.size=1,
+             color = "black",
+             fill="lightyellow")
+```
+
+
+Taxa Letalidade no Brasil {data-navmenu="Brasil"}
+=================
+```{r BR1, echo=FALSE}
+
+Resumo_BR <- Brasil_Dia %>%
+  arrange(-deaths) %>%
+  select(state, confirmed, deaths, death_rate)
+
+Resumo_BR[is.na(Resumo_BR)] <- 0
+
+datatable(data = Resumo_BR,
+          rownames = TRUE,
+          colnames = c("Estado", "Confirmados", "Óbitos", "Taxa de 
+                       Letalidade"),
+          options = list(pageLength = nrow(Resumo_BR), dom = 'tip')) %>%
+  formatPercentage('death_rate', 2)
+```
+
+
+Gráfico de Área: Brasil {data-navmenu="Brasil"}
+===============================================
+
+```{r BR3, echo=F}
+#--------------------------
+# Casos acumulados Brasil -
+#--------------------------
+# Gráfico do Número de Casos Acumulados: Brasil
+Brasil_Datas[is.na(Brasil_Datas)] <- 0
+
+BR_datas <- Brasil_Datas %>%
+  select(date, state, confirmed, deaths) %>%
+  group_by(date) %>%
+  summarise(Confirmados=sum(confirmed, na.rm=TRUE),
+            Obitos=sum(deaths, na.rm=TRUE))
+
+# Número de Casos Acumulados - Brasil
+plotly::plot_ly(BR_datas, x = ~date, y = ~Confirmados, 
+                name = 'Confirmados', type = 'scatter', mode = 'none', 
+                stackgroup = 'one', fillcolor = "#1f77b4") %>%
+  plotly::add_trace(y = ~Obitos, name = "Óbitos", fillcolor = "red") %>%
+  plotly::layout(title = "",
+                 xaxis = list(title = " ",
+                              type = 'date',
+                              tickformat = "%d %b",
+                              showgrid = FALSE),
+                 yaxis = list(title = "Total de Casos no Brasil",
+                              showgrid = FALSE),
+                 legend = list(x = 0.1, y = 0.9),
+                 hovermode = "compare")
+```
+
+
+Gráfico Interativo: Brasil {data-navmenu="Brasil"}
+=====================================================
+```{r BR4, echo=F}
+
+#--------------------------------------------------------
+# Número de casos do Brasil (gráfico dash - Interativo) -
+#--------------------------------------------------------
+plot_ly(data = BR_datas) %>%
+  add_trace(x = ~ date,
+            y = ~ Confirmados,
+            type = "scatter",
+            mode = "lines+markers",
+            name = "Confirmados",
+            line = list(color = active_color),
+            marker = list(color = active_color)) %>%
+  add_trace(x = ~ date,
+            y = ~ Obitos,
+            type = "scatter",
+            mode = 'lines+markers',
+            name = "Óbitos",
+            line = list(color = death_color),
+            marker = list(color = death_color)) %>%
+  layout(title = "",
+         yaxis = list(title = "Número de Casos no Brasil"),
+         xaxis = list(title = " ",
+                      type = 'date',
+                      tickformat = "%d %b"),
+         legend = list(x = 0.1, y = 0.9),
+         hovermode = "compare")
+```
+
+
+Estados Brasileiros com mais de 800 Casos{data-navmenu="Brasil"}
+=====================================================
+```{r BR5, echo=F}
+Brasil_Dia[is.na(Brasil_Dia)] <- 0
+
+Brasil_Dia %>% 
+  dplyr::select(state,confirmed, deaths) %>%
+  dplyr::arrange(- confirmed) %>%
+  dplyr::filter(confirmed >= 800) %>%
+  dplyr::mutate(death_rate = deaths / confirmed) %>% 
+  dplyr::mutate(death_rate = dplyr::if_else(is.na(death_rate), 0, death_rate)) %>%
+  dplyr::ungroup() %>%
+  #dplyr::top_n(n = 10, wt = confirmed) %>%
+  plotly::plot_ly(y = ~ confirmed,
+                  x = ~ deaths,
+                  size = ~  confirmed,
+                  sizes = c(20, 60),
+                  type = 'scatter', mode = 'markers',
+                  color = ~ state,
+                  marker = list(sizemode = 'diameter' , opacity = 0.9),
+                  hoverinfo = 'text',
+                  text = ~paste("</br>", state, 
+                                "</br> Casos Confirmados: ", confirmed,
+                                "</br> Taxa de Letalidade: ",  paste(round(100 * death_rate, 1), "%", sep = ""))
+  ) %>%
+  plotly::layout(yaxis = list(title = "Total de Casos Confirmados"),
+                 xaxis = list(title = "Total de Óbitos"),
+                 hovermode = "compare")
+```
+
+
+Mapa: Casos Confirmados {data-navmenu="Brasil"}
+==========================
+```{r BR6, echo=F, fig.pos="H", fig.align='center'}
+require(leaflet)
+
+pal <- colorBin("Oranges", domain=BRCovid$confirmed, na.color='white')
+
+state_BR <- paste0("<strong> Estado: </strong>", BRCovid$NM_ESTADO,
+                   "<br><strong> Confirmados: </strong>", BRCovid$confirmed,
+                   "<br><strong> Óbitos: </strong>", BRCovid$deaths)%>%
+  lapply(htmltools::HTML)
+
+BRCasos <- leaflet(data=BRCovid, width=2000, height=1000) %>%
+  addProviderTiles("CartoDB.Positron") %>%
+  addPolygons(fillColor=~pal(BRCovid$confirmed),
+              fillOpacity=2.5,
+              color = "black",
+              weight=1,
+              label = state_BR,
+              labelOptions = labelOptions(direction='auto', textsize=16))  %>%
+  addLegend("topright", pal=pal, values=~BRCovid$confirmed,
+            title="Casos Confirmados", opacity=1)
+
+library(leaflet.extras)
+
+CasosBR <- addControlGPS(BRCasos, options=gpsOptions(position="topleft", activate=TRUE, autoCenter=TRUE, maxZoom=10, setView = TRUE))
+
+activateGPS(CasosBR)
+```
+
+
+Mapa: Número de Óbitos {data-navmenu="Brasil"}
+=======================================================
+```{r BR7, echo=F, fig.pos="H", fig.align='center'}
+branco = ifelse(BRCovid$deaths==0, NA, BRCovid$deaths)
+
+#pal <- colorBin(colortools::wheel("steelblue", num=10, border='red'), 
+#                 domain=BRCovid$deaths, na.color='lightyellow', bins=10)
+
+pal <- colorBin("Oranges", domain=branco, na.color="white")
+pal <- colorNumeric("Oranges", domain=branco, na.color="white")
+
+state_popup <- paste0("<strong> Estado: </strong>", BRCovid$NM_ESTADO,
+                      "<br><strong> Confirmados: </strong>", BRCovid$confirmed,
+                      "<br><strong> Mortes: </strong>", BRCovid$deaths) %>%
+  lapply(htmltools::HTML)
+
+BRObito <-leaflet(data=BRCovid, width=2000, height=1000) %>%
+  addProviderTiles("CartoDB.Positron") %>%
+  addPolygons(fillColor=~pal(BRCovid$deaths), #pal(branco),
+              fillOpacity = 2.5,
+              color = "black",
+              weight = 1,
+              label = state_popup,
+              labelOptions = labelOptions(direction='auto', textsize=16))  %>%
+  addLegend("topright", pal=pal, values=~BRCovid$deaths,
+            title = "Óbitos", 
+            opacity =1)
+
+BRObitos <- addControlGPS(BRObito, options=gpsOptions(position="topleft", activate=TRUE, autoCenter=TRUE, maxZoom=10, setView=TRUE))
+
+activateGPS(BRObitos)
+```

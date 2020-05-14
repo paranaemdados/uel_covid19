@@ -1,0 +1,358 @@
+Cidades da 17 RS {data-navmenu="17_Regional"}
+=============================================
+```{r RS1, echo=FALSE}
+Regional_Datas %>%
+  select(Data=date, Cidade=city, `Óbitos`=deaths,
+         `Número de Casos`=confirmed) %>%
+  datatable(rownames=FALSE,
+            options=list(searchHighlight=TRUE, pageLength=31),
+            filter='top')
+```
+
+
+Taxa Letalidade {data-navmenu="17_Regional"}
+======================================================
+```{r RS2, echo=FALSE}
+Resumo_PR <- Regional_Dia %>%
+  dplyr::arrange(-deaths)  %>%
+  dplyr::select(city, confirmed, deaths, death_rate)
+
+Resumo_PR[is.na(Resumo_PR)] <- 0
+
+datatable(data = Resumo_PR,
+          rownames = FALSE,
+          colnames = c("Cidades", "Confirmados", "Óbitos","Taxa de Letalidade"),
+          options = list(pageLength=nrow(Resumo_PR), dom='tip'))  %>%
+  formatPercentage('death_rate', 2)
+```
+
+
+Casos vs Óbitos {data-navmenu="17_Regional"}
+============================================
+```{r RS3, echo=F, fig.align='center', fig.height=7, fig.width=14}
+plot_ly(data = Regional_Dia[!c(is.na(Regional_Dia$confirmed)==TRUE),],
+        x = ~ reorder(city, -confirmed),
+        y = ~ confirmed,
+        type = "bar",
+        name = "Confirmados",
+        marker = list(color = cor_ativo)) %>%
+  add_trace(y = ~ deaths,
+            name = "Óbitos",
+            marker = list(color = cor_obito)) %>%
+  layout(barmode = 'stack',
+         yaxis = list(title = "Total de Casos",
+                      type = ""),
+         xaxis = list(title = ""),
+         hovermode = "compare",
+         margin =  list(
+           b = 10,
+           t = 10,
+           pad = 2))
+```
+
+
+Casos Novos {data-navmenu="17_Regional"}
+========================================
+```{r RS4, echo=F, fig.align='center', fig.height=6, fig.width=14}
+# Evolução de Casos da 17 Regional de Saúde
+Regional_datas <- Regional_Datas
+Regional_datas$date = ymd(Regional_datas$date)
+
+Regional_datas <- Regional_datas %>%
+  dplyr::select(date, state, confirmed, deaths) %>%
+  group_by(date) %>%
+  summarise(confirmed=sum(confirmed, na.rm=TRUE),
+            Obitos=sum(deaths, na.rm=TRUE))
+
+Limites_Y = c(0, max(Regional_datas$confirmed))
+Ultima_Data = first(Regional_datas$date)
+Primeira_Data = last(Regional_datas$date)
+
+# Gráfico de Tendência
+Graf_Regional_Tend = ggplot(Regional_datas,
+                            aes(date, confirmed, label=confirmed)) +
+  geom_point(size=3.5, col='red') +
+  geom_line(lwd=1, col='black') +
+  scale_x_date(name='Datas', date_labels="%d %b",
+               date_minor_breaks="1 day",
+               breaks = seq(as.Date("2020-03-12"),
+                            as.Date(Primeira_Data),
+                            by="5 days")) +
+  scale_y_continuous(name='Número de Casos', limits=Limites_Y,
+                     n.breaks=6) +
+  geom_text_repel(nudge_y=0, nudge_x=1.2, segment.size=0.1) +
+  theme(text=element_text(size=20),
+        axis.line=element_line(colour, size=1.2, linetype='solid',
+                               color='darkblue'),
+        axis.text.x=element_text(color="darkblue", face='bold',
+                                 size=12, angle=0, hjust=.5, vjust=.5),
+        axis.text.y=element_text(color="darkblue", face='bold', size=12,
+                                 angle=0, hjust=1, vjust=0),
+        axis.title.x=element_text(color="black", face='bold', size=16,
+                                  angle=0, hjust=.5, vjust=0),
+        axis.title.y=element_text(color="black", face='bold', size=16,
+                                  angle= 90, hjust=.5, vjust=.5)) +
+  geom_label(label="Número de Casos da \n 17 Regional de Saúde",
+             x=as.Date('2020-03-27'), y=max(Regional_datas$confirmed), size=5,
+             label.padding=unit(1.25, "lines"),
+             label.size=1,
+             color = "black",
+             fill="lightyellow")
+
+# Gráfico dos Novos Casos no Paraná -
+#------------------------------------
+Regional_datas$Novos = c(0, diff(Regional_datas$confirmed))
+
+Limites_Y_n = c(0, max(Regional_datas$Novos))
+
+Graf_Novos_Casos = ggplot(Regional_datas, aes(date, Novos, label=Novos)) +
+  geom_point(size=3.5, col='red') +
+  geom_line(lwd=1.2, col='black') +
+  scale_x_date(name='Datas',
+               date_labels="%d %b", date_minor_breaks="1 day",
+               breaks = seq(as.Date("2020-03-12"),
+                            as.Date(max(Regional_datas$date)),
+                            by="5 days")) +
+  scale_y_continuous(name='Casos Novos',
+                     limits=Limites_Y_n, n.breaks=6) +
+  geom_text_repel(nudge_y=0, nudge_x=.3, segment.size=0.1) +
+  theme(text=element_text(size=20),
+        axis.line=element_line(colour, size=1.2, linetype='solid',
+                               color='darkblue'),
+        axis.text.x=element_text(color="darkblue", face='bold', size=12,
+                                 angle=0, hjust=.5, vjust=.5),
+        axis.text.y=element_text(color="darkblue", face='bold', size=12,
+                                 angle=0, hjust=1, vjust=0),
+        axis.title.x=element_text(color="black", face='bold', size=16,
+                                  angle=0, hjust=.5, vjust=0),
+        axis.title.y=element_text(color="black", face='bold', size=16,
+                                  angle= 90, hjust=.5, vjust=.5)) +
+  geom_label(label="Número de Casos Novos da \n 17 Regional de Saúde",
+             x=as.Date('2020-04-22'), y=max(Regional_datas$Novos), size=5,
+             label.padding=unit(1.25, "lines"),
+             label.size=1,
+             color = "black",
+             fill="lightyellow")
+
+library(ggpubr)
+ggarrange(Graf_Regional_Tend, Graf_Novos_Casos, ncol=2, nrow=1)
+```
+
+
+Gráfico de Área: 17 Regional {data-navmenu="17_Regional"}
+=========================================================
+```{r RS5, echo=F}
+#-------------------------------
+# Casos Acumulados 17 Regional -
+#-------------------------------
+REGIO = Regional_datas %>%
+  arrange(date)
+
+# Gráfico do Número de Casos Acumulados: Paraná
+plot_ly(REGIO, x=~date, y=~confirmed, name='Confirmados', type='scatter',
+        mode='none', stackgroup='one', fillcolor="#1f77b4") %>%
+  add_trace(y=~Obitos, name="Óbitos", fillcolor="red") %>%
+  layout(title="",
+         xaxis = list(title = " ",
+                      type = 'date',
+                      tickformat = "%d %b",
+                      showgrid = FALSE),
+         yaxis = list(title = "Totais de Casos no Paraná",
+                      showgrid = FALSE),
+         legend = list(x = 0.1, y = 0.9),
+         hovermode = "compare")
+```
+
+
+
+Gráfico Interativo: 17 Regional {data-navmenu="17_Regional"}
+============================================================
+```{r RS6, echo=F}
+plot_ly(data = Regional_datas) %>%
+  add_trace(x = ~ date,
+            y = ~ confirmed,
+            type = "scatter",
+            mode = "lines+markers",
+            name = "Confirmados",
+            line = list(color = active_color),
+            marker = list(color = active_color)) %>%
+  add_trace(x = ~ date,
+            y = ~ Obitos,
+            type = "scatter",
+            mode = 'lines+markers',
+            name = "Óbitos",
+            line = list(color = death_color),
+            marker = list(color = death_color)) %>%
+  layout(title = "",
+         yaxis = list(title = "Número de Casos da 17 Regional de Saúde"),
+         xaxis = list(title = " ",
+                      type = 'date',
+                      tickformat = "%d %b"),
+         legend = list(x = 0.1, y = 0.9),
+         hovermode = "compare")
+```
+
+
+
+Cidades com mais casos {data-navmenu="17_Regional"}
+===================================================
+```{r RS7, echo=F}
+
+Regional_Dia %>%
+  dplyr::select(city, confirmed, deaths) %>%
+  arrange(-confirmed) %>%
+  filter(confirmed >= 0) %>%
+  mutate(death_rate = deaths / confirmed) %>%
+  mutate(death_rate = if_else(is.na(death_rate), 0, death_rate)) %>%
+  ungroup() %>%
+  plotly::plot_ly(y = ~ confirmed,
+                  x = ~ deaths,
+                  size = ~  confirmed,
+                  sizes = c(30, 70),
+                  type = 'scatter', mode = 'markers',
+                  color = ~ city,
+                  marker = list(sizemode = 'diameter' , opacity = 0.9),
+                  hoverinfo = 'text',
+                  text = ~paste("</br>", city,
+                                "</br> Casos Confirmados: ", confirmed,
+                                "</br> Taxa de Letalidade: ",  paste(round(100 * death_rate, 1), "%", sep = ""))
+  ) %>%
+  plotly::layout(yaxis = list(title = "Total de Casos Confirmados"),
+                 xaxis = list(title = "Total de Óbitos"),
+                 hovermode = "compare")
+```
+
+
+
+Coeficiente de Incidência {data-navmenu="17_Regional"}
+======================================================
+```{r RS8, echo=F, fig.pos="H", fig.align='center'}
+
+parte = Regional_Dia %>%
+  dplyr::select(Cidades=city,
+                estimated_population_2019,
+                Confirmados_por_100k_habitantes=confirmed_per_100k_inhabitants,
+                deaths,
+                death_rate) %>%
+  arrange(-Confirmados_por_100k_habitantes) %>%
+  filter(Cidades != 'Importados/Indefinidos' & deaths!=0)
+
+ggplot(parte, aes(x="", y=Confirmados_por_100k_habitantes, fill=Cidades)) +
+  geom_col(width=1) +
+  ggtitle('Coeficiente de Incidência \n (x 100.000 habitantes)') +
+  theme(plot.title = element_text(size=20, face = "bold")) +
+  scale_fill_manual(values=c("red", "lightblue", 'lightgreen')) +
+  coord_polar("y", start=pi/3)
+```
+
+
+
+Mapa: Casos Confirmados {data-navmenu="17_Regional"}
+====================================================
+```{r RS9, echo=F, fig.pos="H", fig.align='center'}
+REG17 = c("ALVORADA DO SUL",
+          "ASSAÍ",
+          "BELA VISTA DO PARAÍSO",
+          "CAFEARA",
+          "CAMBÉ",
+          "CENTENÁRIO DO SUL",
+          "FLORESTÓPOLIS",
+          "GUARACI",
+          "IBIPORÃ",
+          "JAGUAPITÃ",
+          "JATAIZINHO",
+          "LONDRINA",
+          "LUPIONÓPOLIS",
+          "MIRASELVA",
+          "PITANGUEIRAS",
+          "PORECATU",
+          "PRADO FERREIRA",
+          "PRIMEIRO DE MAIO",
+          "ROLÂNDIA",
+          "SERTANÓPOLIS",
+          "TAMARANA")
+
+reg17 = PRCovid[PRCovid$NM_MUNICIP==REG17[1] |
+                  PRCovid$NM_MUNICIP==REG17[2] |
+                  PRCovid$NM_MUNICIP==REG17[3] |
+                  PRCovid$NM_MUNICIP==REG17[4] |
+                  PRCovid$NM_MUNICIP==REG17[5] |
+                  PRCovid$NM_MUNICIP==REG17[6] |
+                  PRCovid$NM_MUNICIP==REG17[7] |
+                  PRCovid$NM_MUNICIP==REG17[8] |
+                  PRCovid$NM_MUNICIP==REG17[9] |
+                  PRCovid$NM_MUNICIP==REG17[10] |
+                  PRCovid$NM_MUNICIP==REG17[11] |
+                  PRCovid$NM_MUNICIP==REG17[12] |
+                  PRCovid$NM_MUNICIP==REG17[13] |
+                  PRCovid$NM_MUNICIP==REG17[14] |
+                  PRCovid$NM_MUNICIP==REG17[15] |
+                  PRCovid$NM_MUNICIP==REG17[16] |
+                  PRCovid$NM_MUNICIP==REG17[17] |
+                  PRCovid$NM_MUNICIP==REG17[18] |
+                  PRCovid$NM_MUNICIP==REG17[19] |
+                  PRCovid$NM_MUNICIP==REG17[20] |
+                  PRCovid$NM_MUNICIP==REG17[21], ]
+
+branco = ifelse(reg17$last_available_confirmed==0, NA, reg17$last_available_confirmed)
+
+pal <- colorBin(colortools::wheel("steelblue", num=10, border='red'),
+                domain=reg17$last_available_confirmed, 
+                na.color='lightyellow', bins=c(1,2,3,4,5,10,50,100,110, 120))
+
+#labelFormat(prefix = "", suffix = "", between = " &ndash; ",
+#  digits = 3, big.mark = ",", transform = identity)
+
+
+
+state_popup <- paste0("<strong> Municipio: </strong>", reg17$NM_MUNICIP,
+                      "<br><strong> Confirmados: </strong>", reg17$last_available_confirmed,
+                      "<br><strong>Mortes: </strong>", reg17$last_available_deaths) %>%
+  lapply(htmltools::HTML)
+
+regional17 <- leaflet(data=reg17, width=2000, height=1000) %>%
+  addProviderTiles("CartoDB.Positron") %>%
+  addPolygons(fillColor = ~pal(branco),
+              fillOpacity = 4.5,
+              color = "red",
+              weight = 3,
+              label = state_popup,
+              labelOptions = labelOptions(direction='auto', textsize=16))  %>%
+  addLegend("topright", pal=pal, values=~reg17$last_available_confirmed,
+            na.label='0',
+            title = "Casos Confirmados",
+            opacity=4.5)
+
+regional17 <- addControlGPS(regional17, options=gpsOptions(position="topleft", activate=TRUE, autoCenter=TRUE, maxZoom=20, setView=TRUE))
+
+activateGPS(regional17)
+
+# 
+# branco = ifelse(RegionalCovid$confirmed==0, NA, RegionalCovid$confirmed)
+# 
+# pal <- colorBin(colortools::wheel("steelblue", num=10, border='red'),
+#                 domain=RegionalCovid$confirmed, na.color='lightyellow', bins=10)
+# 
+# state_popup <- paste0("<strong> Municipio: </strong>", RegionalCovid$NM_MUNICIP,
+#                       "<br><strong> Confirmados: </strong>", RegionalCovid$confirmed,
+#                       "<br><strong>Mortes: </strong>", RegionalCovid$deaths) %>%
+#   lapply(htmltools::HTML)
+# 
+# RegionalCasos <-leaflet(data=RegionalCovid, width=2000, height=1000) %>%
+#   addProviderTiles("CartoDB.Positron") %>%
+#   addPolygons(fillColor = ~pal(branco),
+#               fillOpacity = 2.5,
+#               color = "black",
+#               weight = 1,
+#               label = state_popup,
+#               labelOptions = labelOptions(direction='auto', textsize=16))  %>%
+#   addLegend("topright", pal=pal, values=~RegionalCovid$confirmed,
+#             title = "Casos Confirmados",
+#             opacity =1)
+# 
+# CasosRegional <- addControlGPS(RegionalCasos,
+#                          options=gpsOptions(position="topleft",
+#                                             activate=TRUE, autoCenter=TRUE, maxZoom=10, setView=TRUE))
+# 
+# activateGPS(CasosRegional)
+```

@@ -1,0 +1,175 @@
+```{r população, echo=F}
+Pop_Brasil = 210147125
+Pop_Parana = 11433957
+Pop_Londrina = 569733
+
+Total_Casos = Parana_Datas$confirmed[last(Parana_Datas$date)]
+Total_Mortes = Parana_Datas$deaths[last(Parana_Datas$date)]
+```
+
+
+Resumo
+========================================
+Row {data-height=50}
+----------------------------------------
+### Brasil {.value-box}{.no-mobile}
+```{r, echo=F}
+valueBox(value=paste(''), caption=shiny::tags$p("BRASIL", style="font-size: 250%;"), color='teal')
+```
+
+### Paraná {.value-box}{.no-mobile}
+```{r, echo=F}
+valueBox(value=paste(''), caption=shiny::tags$p("PARANÁ", style="font-size: 250%;"), color='olive')
+```
+
+### Londrina {.value-box}{.no-mobile}
+```{r, echo=F}
+valueBox(value=paste(''), caption=shiny::tags$p("LONDRINA", style="font-size: 250%;"), color='maroon')
+```
+
+
+
+### Brasil {.value-box}{.mobile}
+```{r, echo=F}
+valueBox(value=paste(''), caption=shiny::tags$p("BRASIL", style="font-size:250%;"), color='teal')
+```
+
+### Número de Habitantes do Brasil {.value-box}{.mobile}
+```{r, echo=F}
+valueBox(value = paste('População: ', format(Pop_Brasil, sep=' ', big.mark=".")), caption=shiny::tags$p("Estimativa do número de habitantes do Brasil em 2019.", style="font-size: 150%;"),  color='teal')
+```
+
+### Número de Óbitos no Brasil {.value-box}{.mobile}
+```{r, echo=F}
+valueBox(value=paste(
+  format(sum(dfBR$deaths, na.rm=TRUE), big.mark="."), " (",
+  format(round(100*sum(dfBR$deaths, na.rm=TRUE) / sum(dfBR$confirmed), 2), big.mark='.', decimal.mark=','), "%)", sep=""),
+  caption=shiny::tags$p("Número de óbitos no Brasil em
+  relação ao total de casos confirmados no País.", style="font-size: 150%;"), icon="skull-outline", color='teal')
+```
+
+
+
+Row {data-height=200}
+----------------------
+### Número de Habitantes do Brasil {.value-box}{.no-mobile}
+```{r, echo=F}
+valueBox(value = paste('População: ', format(Pop_Brasil, sep=' ', big.mark=".")), caption=shiny::tags$p("Estimativa do número de habitantes do Brasil em 2019.", style="font-size: 150%;"),  color='teal')
+```
+
+### Número de Habitantes do Paraná {.value-box}{.no-mobile}
+```{r, echo=F}
+valueBox(value = paste('População: ', format(Pop_Parana, sep=' ', big.mark=".")), caption=shiny::tags$p("Estimativa do número de habitantes do Paraná em 2019.", style="font-size: 150%;"),  color='olive')
+```
+
+### Número de Habitantes de Londrina {.value-box}{.no-mobile}
+```{r, echo=F}
+valueBox(value = paste('População: ', format(Pop_Londrina, sep=' ', big.mark=".")), caption=shiny::tags$p("Estimativa do número de habitantes de Londrina em 2019.", style="font-size: 150%;"),  color='maroon')
+```
+
+### Paraná {.value-box}{.mobile}
+```{r, echo=F}
+valueBox(value=paste(''), caption=shiny::tags$p("PARANÁ", style="font-size: 250%;"), color='olive')
+```
+
+### Número de Habitantes do Paraná {.value-box}{.mobile}
+```{r, echo=F}
+valueBox(value = paste('População: ', format(Pop_Parana, sep=' ', big.mark=".")), caption=shiny::tags$p("Estimativa do número de habitantes do Paraná em 2019.", style="font-size: 150%;"),  color='olive')
+```
+
+### Número de Óbitos no Paraná {.value-box}{.mobile}
+```{r, echo=F}
+valueBox(value=paste(
+  format(Total_Mortes, big.mark="."), " (",
+  format(round(100*Total_Mortes / Total_Casos, 2), big.mark='.', decimal.mark=','), "%)", sep=""),   caption=shiny::tags$p("Número de óbitos no Paraná em relação ao total de casos confirmados no Estado.", style="font-size: 150%;"), icon="skull-outline", color='olive')
+```
+
+
+
+
+Row {data-height=200}
+----------------------
+### Número de Casos Confirmados no Brasil {.value-box}{.no-mobile}
+```{r, echo=F}
+valueBox(value=paste(
+  format(sum(dfBR$confirmed, na.rm=TRUE), big.mark="."), " (",
+  format(round(100*sum(dfBR$confirmed, na.rm=TRUE) /
+                 (Pop_Brasil), 6), big.mark='.', decimal.mark=','), "%)", sep=""),
+  caption=shiny::tags$p("Número de casos confirmados no Brasil e seu
+                        percentual em relação ao número de habitantes do
+                        País.", style="font-size: 150%;"), icon="skull-outline", color='teal')
+```
+
+### Número de Casos Confirmados no Paraná {.value-box}{.no-mobile}
+```{r, echo=F}
+valueBox(value=paste(
+  format(Total_Casos, big.mark="."), " (",
+  format(round(100*Total_Casos /
+                 (Pop_Parana), 6), big.mark='.', decimal.mark=','), "%)",
+  sep=""),
+  caption=shiny::tags$p("Número de casos confirmados no Paraná e seu
+                        percentual em relação ao número de habitantes
+                        do Estado.", style="font-size: 150%;"),
+  icon="skull-outline", color='olive')
+```
+
+### Número de Casos Confirmados em Londrina {.value-box}{.no-mobile}
+```{r, echo=F}
+valueBox(value=paste(
+  format(sum(dfLON$confirmed, na.rm=TRUE), big.mark="."), " (",
+  format(round(100*sum(dfLON$confirmed, na.rm=TRUE) /
+                 (Pop_Londrina), 6), big.mark='.',
+         decimal.mark=','), "%)", sep=""),
+  caption=shiny::tags$p("Número de casos confirmados em Londrina e
+                        seu percentual em relação ao número de
+                        habitantes da Cidade.", style="font-size:
+                        150%;"), icon="skull-outline",
+  color='maroon')
+```
+
+
+Row {data-height=200}
+-----------------------------------------------------------------------
+### Número de Óbitos no Brasil {.value-box}{.no-mobile}
+```{r, echo=F}
+valueBox(value=paste(
+  format(sum(dfBR$deaths, na.rm=TRUE), big.mark="."), " (",
+  format(round(100*sum(dfBR$deaths, na.rm=TRUE) / sum(dfBR$confirmed), 2), big.mark='.', decimal.mark=','), "%)", sep=""),
+  caption=shiny::tags$p("Número de óbitos no Brasil em
+  relação ao total de casos confirmados no País.", style="font-size: 150%;"), icon="skull-outline", color='teal')
+```
+
+### Número de Óbitos no Paraná {.value-box}{.no-mobile}
+```{r, echo=F}
+valueBox(value=paste(
+  format(Total_Mortes, big.mark="."), " (",
+  format(round(100*Total_Mortes / Total_Casos, 2), big.mark='.', decimal.mark=','), "%)", sep=""),
+  caption=shiny::tags$p("Número de óbitos no Paraná em relação ao total de casos confirmados no Estado.", style="font-size: 150%;"), icon="skull-outline", color='olive')
+```
+
+### Número de Óbitos em Londrina {.value-box}{.no-mobile}
+```{r, echo=F}
+valueBox(value=paste(
+  format(sum(dfLON$deaths, na.rm=TRUE), big.mark="."), " (",
+  format(round(100*sum(dfLON$deaths, na.rm=TRUE) / sum(dfLON$confirmed, na.rm=TRUE), 2), big.mark='.', decimal.mark=','), "%)", sep=""), caption=shiny::tags$p("Número de óbitos em Londrina e seu percentual em relação ao número casos confirmados da Cidade.", style="font-size: 150%;"), icon="skull-outline", color='maroon')
+```
+
+### Londrina {.value-box}{.mobile}
+```{r, echo=F}
+valueBox(value=paste(''), caption=shiny::tags$p("LONDRINA", style="font-size: 250%;"), color='maroon')
+```
+
+
+### Número de Habitantes de Londrina {.value-box}{.mobile}
+```{r, echo=F}
+# valueBox(value = paste('População: ', format(dfLON$estimated_population_2019, na.rm=TRUE, sep=' ',  big.mark=".")), caption=shiny::tags$p("Estimativa do número de habitantes de Londrina em 2019.", style="font-size: 150%;"),  color='maroon')
+
+valueBox(value = paste('População: ', format(Pop_Londrina, sep=' ', big.mark=".")), caption=shiny::tags$p("Estimativa do número de habitantes de Londrina em 2019.", style="font-size: 150%;"),  color='maroon')
+```
+
+### Número de Óbitos em Londrina {.value-box}{.mobile}
+```{r, echo=F}
+valueBox(value=paste(
+  format(sum(dfLON$deaths, na.rm=TRUE), big.mark="."), " (",
+  format(round(100*sum(dfLON$deaths, na.rm=TRUE) / sum(dfLON$confirmed, na.rm=TRUE), 2), big.mark='.', decimal.mark=','), "%)", sep=""), caption=shiny::tags$p("Número de óbitos em Londrina e seu percentual em relação ao número casos confirmados da Cidade.", style="font-size: 150%;"), icon="skull-outline", color='maroon')
+```

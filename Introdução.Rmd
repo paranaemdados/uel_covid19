@@ -1,0 +1,22 @@
+Introdução
+=======================================================================
+Row {data-widht=300}
+-----------------------------------------------------------------------
+O objetivo desta página é agregar informações atualizadas e visualizações de dados sobre a pandemia **Covid-19** no Brasil, mais especialmente no Estado do Paraná. <br><br>
+As estimativas populacionais usadas são as divulgadas pelo [IBGE][] e referem-se ao ano de 2019. <br><br>
+O conteúdo disponibilizado é fruto do trabalho dos docentes do [Departamento de Estatística][] da [Universidade Estadual de Londrina][], com o apoio da Direção do [Centro de Ciências Exatas][]. <br><br>
+Os dados são referentes ao boletim informativo divulgado no site da Secretaria Estadual de Saúde do Paraná ([SESA][]) e demais Secretarias Estaduais. Esses dados são importados da página [Brasil.io][], um repositório de dados públicos. A importação dos dados foi feita em **`r format(Sys.time(), '%d de %B de %Y, às %H:%M')`h,** e contém a informação de **`r length(unique(Brasil_Dia$state))`** **Estados**, no momento. <br><br>
+O **número de municípios** do Paraná em que ocorreu ao menos um óbito 
+devido ao **Covid-19**, é de **`r mun_com_mortes`**. <br><br> 
+Já o número de municípios que **não apresentaram** casos da doença é de **`r mun_sem_casos`,** ou seja, **`r paste(round(100*mun_sem_casos/399, 1), '%', sep='')`.**<br><br>
+**Nota:** Para visualizar o conteúdo, clique nas abas acima. Em `RESUMO`, são apresentados dados percentuais de casos confirmados e óbitos em Londrina, Paraná e Brasil, considerando suas respectivas populações. Nas abas `LONDRINA`, `PARANÁ` e `BRASIL`, são apresentadas tabelas e gráficos  abordando a atual situação do **Covid-19**, por localidade e ao longo do tempo.<br><br>
+**Observação:** No dia 21/04/2020, após investigação pela 17ª Regional de Saúde de Londrina, cinco casos confirmados por laboratório privado de residentes do município de Londrina foram **_descartados_**.
+
+
+<!-- Endereços Usados -->
+[IBGE]: https://www.ibge.gov.br/cidades-e-estados.html?
+[Departamento de Estatística]: http://www.uel.br/cce/dsta/portal/ 
+[Universidade Estadual de Londrina]: http://www.uel.br/
+[Centro de Ciências Exatas]: http://www.uel.br/cce/
+[SESA]: http://www.saude.pr.gov.br/modules/conteudo/conteudo.php?conteudo=3507
+[Brasil.io]: https://www.brasil.io/dataset/covid19/caso

@@ -1,0 +1,60 @@
+```{r agrupamento, include=FALSE}
+
+#-----------------------
+# Juntando os arquivos -
+#-----------------------
+BRCovid = merge(BRA, Brasil_Dia, by.x="CD_GEOCUF", by.y="city_ibge_code",
+                duplicateGeoms=FALSE)
+BRCovid = BRCovid[order(BRCovid$CD_GEOCUF), ]
+
+
+PRCovid = merge(PR, Parana_Dia, by.x="CD_GEOCMU", by.y="city_ibge_code",
+                duplicateGeoms=TRUE)
+PRCovid = PRCovid[order(PRCovid$CD_GEOCMU), ]
+
+
+# Dados por Bairros de Londrina
+CovidLondrina = read_excel('C:/Corona/Dados/MS/CovidCoordenadasLON.xlsx')
+
+RegionalCovid = merge(PR, Regional_Dia, by.x="CD_GEOCMU", by.y="city_ibge_code.x",
+                duplicateGeoms=TRUE)
+RegionalCovid = RegionalCovid[order(RegionalCovid$CD_GEOCMU), ]
+
+
+# Partidos Políticos
+Estados = merge(BRA, gover, by.x="CD_GEOCUF", by.y="city_ibge_code",
+                duplicateGeoms=FALSE)
+Estados = Estados[order(Estados$CD_GEOCUF), ]
+
+
+# Convertendo os NA's para zero
+BRCovid$confirmed[is.na(BRCovid$confirmed)] <- 0
+BRCovid$deaths[is.na(BRCovid$deaths)] <- 0
+BRCovid$death_rate[is.na(BRCovid$death_rate)] <- 0
+
+PRCovid$confirmed[is.na(PRCovid$confirmed)] <- 0
+PRCovid$deaths[is.na(PRCovid$deaths)] <- 0
+PRCovid$death_rate[is.na(PRCovid$death_rate)] <- 0
+
+RegionalCovid$confirmed[is.na(RegionalCovid$confirmed)] <- 0
+RegionalCovid$deaths[is.na(RegionalCovid$deaths)] <- 0
+RegionalCovid$death_rate[is.na(RegionalCovid$death_rate)] <- 0
+
+`%>%` <- magrittr::`%>%`
+
+
+#--------
+# Dados -
+#--------
+dfBR <- Brasil_Dia %>%
+  group_by(city, deaths, confirmed, estimated_population_2019) %>%
+  summarise(Confirmados = sum(confirmed, na.rm=TRUE))
+
+dfPR <- Parana_Dia %>%
+  group_by(city, deaths, confirmed, estimated_population_2019) %>%
+  summarise(Confirmados = sum(confirmed, na.rm=TRUE))
+
+dfLON <- Londrina_Dia %>%
+  group_by(city, deaths, confirmed, estimated_population_2019) %>%
+  summarise(Confirmados = sum(confirmed, na.rm=TRUE))
+```

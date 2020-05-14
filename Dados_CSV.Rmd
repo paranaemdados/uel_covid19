@@ -1,0 +1,111 @@
+```{r covid, include=FALSE}
+#----------
+# Brasil: -
+#----------
+#
+# Dados do "Último Dia" para todos os Estados.
+Brasil_Dia = read.csv('c:/Corona/Dados/MS/BRASIL_Dia.csv', 
+                      encoding="UTF-8", na.strings=0)
+Brasil_Dia[is.na(Brasil_Dia)] <- 0
+
+# Dados de todas as Datas e todos os Estados.
+Brasil_Datas = read.csv('c:/Corona/Dados/MS/Brasil_Datas.csv', 
+                        encoding="UTF-8", na.strings=0)
+
+#----------
+# Paraná: -
+#----------
+#
+# Dados do "Último Dia", para as cidades do Paraná.
+
+Parana_Dia = read.csv('c:/Corona/Dados/MS/Parana_Dia.csv', encoding="UTF-8",
+                      na.strings=0)
+Parana_Dia$confirmed = Parana_Dia$last_available_confirmed
+Parana_Dia$deaths = Parana_Dia$last_available_deaths
+Parana_Dia$death_rate = Parana_Dia$last_available_death_rate
+Parana_Dia$confirmed_per_100k_inhabitants = Parana_Dia$last_available_confirmed_per_100k_inhabitants
+
+Parana_Dia[is.na(Parana_Dia)] <- 0
+
+# Dados de todas as Datas e todas as Cidades.
+Parana_Cidades_Datas = read.csv('c:/Corona/Dados/MS/Parana_Datas_Cidades.csv',
+                                encoding="UTF-8", na.strings=0)
+
+Parana_Cidades_Datas$confirmed = Parana_Cidades_Datas$last_available_confirmed
+Parana_Cidades_Datas$deaths = Parana_Cidades_Datas$last_available_deaths
+Parana_Cidades_Datas$death_rate = Parana_Cidades_Datas$last_available_death_rate
+Parana_Cidades_Datas$confirmed_per_100k_inhabitants = Parana_Cidades_Datas$last_available_confirmed_per_100k_inhabitants
+
+# Todas as datas sem as Cidades.
+Parana_Datas = read.csv('c:/Corona/Dados/MS/Parana_Datas.csv', encoding="UTF-8", na.strings=0)
+
+
+#------------
+# Londrina: -
+#------------
+#
+# Dados do "Último Dia".
+Londrina_Dia = Parana_Dia[Parana_Dia$city=="Londrina", ]
+
+# Dados de todas as datas.
+Londrina_Datas = Parana_Cidades_Datas %>%  
+  dplyr::filter(city=='Londrina')
+
+
+#-----------------------
+# 17 Regional de Saúde -
+#-----------------------
+#
+regional = read_excel('C:/Corona/Regionais de Saúde/Regionais.xlsx')
+Regional = regional %>% filter(Regional==17)
+
+# Regional Dia
+Regional_Dia = merge(Parana_Dia, Regional, by.x="city", by.y="city",
+                       duplicateGeoms=TRUE)
+# Regional Datas
+Regional_Datas = merge(Parana_Cidades_Datas, Regional, by.x="city", by.y="city",
+                    duplicateGeoms=TRUE)
+
+
+#---------------------
+# Partidos Políticos -
+#---------------------
+#
+gov = read_excel('C:/Corona/Governadores/Governadores_2018.xlsx')
+
+gov = gov %>%
+  dplyr::arrange(UF)
+
+gov$UF = as.factor(gov$UF)
+
+gover = merge(Brasil_Dia, gov, by.x='state', by.y='Sigla')
+
+gover$Casos_Por_Milhão = format(round(gover$confirmed / gover$População_estimada * 1000000, 2), big.mark='.', decimal.mark=',')
+
+gover$Obitos_Por_Milhão = format(round(gover$deaths / gover$População_estimada * 1000000, 2), big.mark='.', decimal.mark=',')
+
+gover$População_estimada = format(gover$População_estimada, big.mark='.', decimal.mark=',')
+
+gover$Densidade_Demog = format(round(gover$Densidade_Demog, 2), big.mark='.', decimal.mark=',')
+
+gover$IDH = format(gover$IDH, big.mark='.', decimal.mark=',')
+
+
+
+
+
+
+
+# Parana Acumulados.
+PRcum = Parana_Datas
+
+PAR = dplyr::select(PRcum, date, confirmed, deaths)
+PAR[is.na(PAR)] <- 0
+
+PAR$deaths
+type <- if_else(PAR$deaths==0, "confirmed", "death")
+
+PAR2 = dplyr::mutate(PAR, type)
+
+`%>%` <- magrittr::`%>%`
+```

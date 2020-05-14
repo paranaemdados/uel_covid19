@@ -1,0 +1,400 @@
+Cidades do Paraná {data-navmenu="Paraná"}
+=========================================
+```{r PR1, echo=FALSE}
+Parana_Cidades_Datas %>% 
+  select(Data=date, Cidade=city, `Óbitos`=deaths,
+         `Número de Casos`=confirmed) %>%
+  datatable(rownames=FALSE,
+            options=list(searchHighlight=TRUE, pageLength=31),
+            filter='top')
+```
+
+
+Taxa Letalidade no Paraná {data-navmenu="Paraná"}
+=================================================
+```{r PR2, echo=FALSE}
+Resumo_PR <- Parana_Dia %>%
+  arrange(-deaths) %>%
+  select(city, confirmed, deaths, death_rate)
+
+Resumo_PR[is.na(Resumo_PR)] <- 0
+
+datatable(data = Resumo_PR,
+          rownames = FALSE,
+          colnames = c("Cidades", "Confirmados", "Óbitos","Taxa de Letalidade"),
+          options = list(pageLength=nrow(Resumo_PR), dom='tip'))  %>%
+  formatPercentage('death_rate', 2)
+```
+
+
+Casos vs Óbitos {data-navmenu="Paraná"}
+=======================================
+```{r PR4, echo=F, fig.align='center', fig.height=7, fig.width=14}
+plot_ly(data = dfPR[!c(-1, is.na(dfPR$confirmed)==TRUE),],
+        x = ~ reorder(city, -confirmed),
+        y = ~ confirmed,
+        type = "bar",
+        name = "Confirmados",
+        marker = list(color = cor_ativo)) %>%
+  add_trace(y = ~ deaths,
+            name = "Óbitos",
+            marker = list(color = cor_obito)) %>%
+  layout(barmode = 'stack',
+         yaxis = list(title = "Total de Casos",
+                      type = ""),
+         xaxis = list(title = ""),
+         hovermode = "compare",
+         margin =  list(
+           b = 10,
+           t = 10,
+           pad = 2))
+```
+
+
+Casos Novos no Paraná {data-navmenu="Paraná"}
+=============================================
+```{r PR5, echo=F, fig.align='center', fig.height=6, fig.width=14}
+#-----------------------------------
+# Arquivo de TODAS as datas com os -
+# totais de cada ESTADO.           -
+#-----------------------------------
+# Brasil_Datas = data.frame(Brasil_Datas)
+# Brasil_Datas$date = ymd(Brasil_Datas$date)
+
+#-------------------------------------------------------
+# Arquivo de TODAS as datas com os totais de cada dia. -
+#-------------------------------------------------------
+# Paraná
+#
+Parana_datas <- Parana_Datas %>%
+  filter(state=='PR')
+
+Parana_datas$date = ymd(Parana_datas$date)
+
+Limites_Y = c(0, max(Parana_datas$confirmed))
+Ultima_Data = first(Parana_datas$date)
+
+# Gráfico de Tendência
+Graf_Parana_Tend = ggplot(Parana_datas, aes(date, confirmed,
+                                            label=confirmed)) +
+  geom_point(size=3.5, col='red') +
+  geom_line(lwd=1, col='black') +
+  scale_x_date(name='Datas',
+               date_labels="%d %b", date_minor_breaks="1 day",
+               breaks = seq(as.Date("2020-03-12"), 
+                            as.Date(max(Parana_datas$date)), 
+                            by="5 days")) +             
+  scale_y_continuous(name='Número de Casos', limits=Limites_Y,
+                     n.breaks=6) +
+  geom_text_repel(nudge_y=0, nudge_x=1.2, segment.size=0.1) +
+  theme(text=element_text(size=20),
+        axis.line=element_line(colour, size=1.2, linetype='solid',
+                               color='darkblue'),
+        axis.text.x=element_text(color="darkblue", face='bold',
+                                 size=12, angle=0, hjust=.5, vjust=.5),
+        axis.text.y=element_text(color="darkblue", face='bold', size=12,
+                                 angle=0, hjust=1, vjust=0),
+        axis.title.x=element_text(color="black", face='bold', size=16,
+                                  angle=0, hjust=.5, vjust=0),
+        axis.title.y=element_text(color="black", face='bold', size=16, 
+                                  angle= 90, hjust=.5, vjust=.5)) +
+  geom_label(label="Número de Casos no Paraná",
+             x=as.Date('2020-03-27'), y=max(Parana_datas$confirmed), size=5,
+             label.padding=unit(1.25, "lines"),
+             label.size=1,
+             color = "black",
+             fill="lightyellow")
+
+#------------------------------------
+# Gráfico dos Novos Casos no Paraná -
+#------------------------------------
+Parana_datas$Novos = c(0, diff(Parana_datas$confirmed))
+
+Limites_Y_n = c(0, max(Parana_datas$Novos))
+
+Graf_Novos_Casos = ggplot(Parana_datas, aes(date, Novos, label=Novos)) +
+  geom_point(size=3.5, col='red') +
+  geom_line(lwd=1.2, col='black') +
+  scale_x_date(name='Datas',
+               date_labels="%d %b", date_minor_breaks="1 day",
+               breaks = seq(as.Date("2020-03-12"), 
+                            as.Date(max(Parana_datas$date)), 
+                            by="5 days")) +
+  scale_y_continuous(name='Casos Novos', 
+                     limits=Limites_Y_n, n.breaks=6) +
+  geom_text_repel(nudge_y=0, nudge_x=.3, segment.size=0.1) +
+  theme(text=element_text(size=20),
+        axis.line=element_line(colour, size=1.2, linetype='solid',
+                               color='darkblue'),
+        axis.text.x=element_text(color="darkblue", face='bold', size=12,
+                                 angle=0, hjust=.5, vjust=.5),
+        axis.text.y=element_text(color="darkblue", face='bold', size=12,
+                                 angle=0, hjust=1, vjust=0),
+        axis.title.x=element_text(color="black", face='bold', size=16,
+                                  angle=0, hjust=.5, vjust=0),
+        axis.title.y=element_text(color="black", face='bold', size=16,
+                                  angle= 90, hjust=.5, vjust=.5)) +
+  geom_label(label="Número de Casos \n Novos no Paraná",
+             x=as.Date('2020-03-22'), y=max(Parana_datas$Novos), size=5,
+             label.padding=unit(1.25, "lines"),
+             label.size=1,
+             color = "black",
+             fill="lightyellow")
+
+library(ggpubr)
+ggarrange(Graf_Parana_Tend, Graf_Novos_Casos, ncol=2, nrow=1)
+```
+
+
+Gráfico de Área: Paraná {data-navmenu="Paraná"}
+=====================================================
+```{r PR6, echo=F}
+#----------------------
+# Casos Acumulados PR -
+#----------------------
+PR = select(PRcum, date, confirmed, deaths)
+PR[is.na(PR)] <- 0
+
+# Gráfico do Número de Casos Acumulados: Paraná
+plot_ly(PR, x=~date, y=~confirmed, name='Confirmados', type='scatter',
+        mode='none', stackgroup='one', fillcolor="#1f77b4") %>%
+  add_trace(y=~deaths, name="Óbitos", fillcolor="red") %>%
+  layout(title="",
+         xaxis = list(title = " ",
+                      type = 'date',
+                      tickformat = "%d %b",
+                      showgrid = FALSE),
+         yaxis = list(title = "Totais de Casos no Paraná",
+                      showgrid = FALSE),
+         legend = list(x = 0.1, y = 0.9),
+         hovermode = "compare")
+```
+
+
+Gráfico Interativo: Paraná {data-navmenu="Paraná"}
+=====================================================
+```{r PR7, echo=F}
+#---------------------------------------------------------
+## Número de casos do Paraná (gráfico dash - Interativo) -
+#---------------------------------------------------------
+Parana_Datas[is.na(Parana_Datas)] <- 0
+
+PR_datas <- Parana_Datas %>%
+  select(date, state, confirmed, deaths) %>%
+  group_by(date) %>%
+  summarise(Confirmados=sum(confirmed, na.rm=TRUE),
+            Obitos=sum(deaths, na.rm=TRUE))
+
+plot_ly(data = PR_datas) %>%
+  add_trace(x = ~ date,
+            y = ~ Confirmados,
+            type = "scatter",
+            mode = "lines+markers",
+            name = "Confirmados",
+            line = list(color = active_color),
+            marker = list(color = active_color)) %>%
+  add_trace(x = ~ date,
+            y = ~ Obitos,
+            type = "scatter",
+            mode = 'lines+markers',
+            name = "Óbitos",
+            line = list(color = death_color),
+            marker = list(color = death_color)) %>%
+  layout(title = "",
+         yaxis = list(title = "Número de Casos no Paraná"),
+         xaxis = list(title = " ",
+                      type = 'date',
+                      tickformat = "%d %b"),
+         legend = list(x = 0.1, y = 0.9),
+         hovermode = "compare")
+```
+
+
+Cidades do Paraná com mais de 15 casos{data-navmenu="Paraná"}
+=====================================================
+```{r PR8, echo=F}
+Parana_Dia[is.na(Parana_Dia)] <- 0
+
+Parana_Dia %>% 
+  dplyr::select(city,confirmed, deaths) %>%
+  dplyr::arrange(- confirmed) %>%
+  dplyr::filter(confirmed >= 15) %>%
+  dplyr::mutate(death_rate = deaths / confirmed) %>% 
+  dplyr::mutate(death_rate = dplyr::if_else(is.na(death_rate), 0, death_rate)) %>%
+  dplyr::ungroup() %>%
+  #dplyr::top_n(n = 8, wt = confirmed) %>%
+  plotly::plot_ly(y = ~ confirmed,
+                  x = ~ deaths,
+                  size = ~  confirmed,
+                  sizes = c(30, 70),
+                  type = 'scatter', mode = 'markers',
+                  color = ~ city,
+                  marker = list(sizemode = 'diameter' , opacity = 0.9),
+                  hoverinfo = 'text',
+                  text = ~paste("</br>", city, 
+                                "</br> Casos Confirmados: ", confirmed,
+                                "</br> Taxa de Letalidade: ",  paste(round(100 * death_rate, 1), "%", sep = ""))
+  ) %>%
+  plotly::layout(yaxis = list(title = "Total de Casos Confirmados"),
+                 xaxis = list(title = "Total de Óbitos"),
+                 hovermode = "compare")
+```
+
+
+
+Coeficiente de Incidência {data-navmenu="Paraná"}
+=======================================================
+```{r PR9, echo=F, fig.pos="H", fig.align='center'}
+parte = Parana_Dia %>%
+   select(city, estimated_population_2019, confirmed_per_100k_inhabitants,
+          deaths, death_rate) %>%
+   arrange(-confirmed_per_100k_inhabitants) %>%
+   filter(city != 'Importados/Indefinidos' & deaths!=0)
+
+ parte = data.frame(parte[1:15, ])
+ cidade = droplevels(parte)$city 
+ Parte = data.frame(cidade, parte) 
+ Parte$cidade <- factor(Parte$cidade,
+ levels=Parte$cidade[order(Parte$confirmed_per_100k_inhabitants)]) 
+
+plot_ly(data = Parte,
+        y = ~reorder(cidade, confirmed_per_100k_inhabitants),
+        x = ~round(confirmed_per_100k_inhabitants, 2),
+        type = "bar",
+        name = "Confirmados",         
+        orientation="h",
+        marker = list(color="lightgreen", 
+                      line=list(width=3, 
+                                color="black"))) %>%
+  layout(barmode = 'stack',
+         title = 'Coeficiente de Incidência \n (x 100.000 hab.)',
+         yaxis = list(title = "Total de Casos",
+                      type = "", 
+                      size=1.5),
+         xaxis = list(title="Datas", size=1.5),
+         hovermode = "compare",
+         margin =  list(b=10, t=50, pad=2))
+```
+
+
+Sul do País {data-navmenu="Paraná"}
+=======================================================
+```{r PR10, echo=F, fig.pos="H", fig.align='center'}
+Brasil_Datas[is.na(Brasil_Datas)] <- 0
+
+type <- if_else(Brasil_Datas$deaths == 0, "confirmado","death")
+
+BR1 = dplyr::mutate(Brasil_Datas, type)
+
+BR1$date = as.Date(BR1$date)
+
+Data_PR = BR1[BR1$state=="PR",]
+Data_SC = BR1[BR1$state=="SC",]
+Data_RS = BR1[BR1$state=="RS",]
+
+plot_ly() %>%
+  add_trace(x = ~ date,
+            y = ~ confirmed,
+            data = Data_PR,
+            type = "scatter",
+            name = 'Paraná',
+            mode = "lines+markers",
+            line = list(width=4),
+            marker = list(size=10)) %>%
+  add_trace(x = ~ date,
+            y = ~ confirmed,
+            data = Data_SC,
+            type = "scatter",
+            name = "Santa Catarina",
+            mode = "lines+markers",
+            line = list(width=4),
+            marker = list(size=10)) %>%
+  add_trace(x = ~ date,
+            y = ~ confirmed,
+            data = Data_RS,
+            type = "scatter",
+            name = "Rio Grande do Sul",
+            mode = "lines+markers",
+            line = list(width=4),
+            marker = list(size=10)) %>%
+  layout(title = "Casos Confirmados",
+         legend = list(x = 0.1, y = 0.9),
+         yaxis = list(title = "Número de Casos por Dia"),
+         xaxis = list(title = "Datas",
+                      type = 'date',
+                      tickformat = "%d %b"),
+         hovermode = "compare",
+         margin <- list(autoexpand = FALSE,
+                        l = 100,
+                        r = 100,
+                        t = 110))
+```
+
+
+
+
+Mapa: Casos Confirmados {data-navmenu="Paraná"}
+=======================================================
+```{r PR11, echo=F, fig.pos="H", fig.align='center'}
+branco = ifelse(PRCovid$confirmed==0, NA, PRCovid$confirmed)
+
+pal <- colorBin(colortools::wheel("steelblue", num=10, border='red'), 
+                 domain=PRCovid$confirmed, na.color='lightyellow', bins=10)
+
+#pal <- colorBin("Oranges", domain=branco, na.color="white")
+#pal <- colorNumeric("Oranges", domain=branco, na.color="white")
+
+state_popup <- paste0("<strong> Municipio: </strong>", PRCovid$NM_MUNICIP,
+                      "<br><strong> Confirmados: </strong>", PRCovid$confirmed,
+                      "<br><strong>Mortes: </strong>", PRCovid$deaths) %>%
+  lapply(htmltools::HTML)
+
+PRCasos <-leaflet(data=PRCovid, width=2000, height=1000) %>%
+  addProviderTiles("CartoDB.Positron") %>%
+  addPolygons(fillColor = ~pal(branco),
+              fillOpacity = 2.5,
+              color = "black",
+              weight = 1,
+              label = state_popup,
+              labelOptions = labelOptions(direction='auto', textsize=16))  %>%
+  addLegend("topright", pal=pal, values=~PRCovid$confirmed,
+            title = "Casos Confirmados", 
+            opacity =1)
+
+CasosPR <- addControlGPS(PRCasos, options=gpsOptions(position="topleft", activate=TRUE, autoCenter=TRUE, maxZoom=10, setView=TRUE))
+
+activateGPS(CasosPR)
+```
+
+
+
+Mapa: Número de Óbitos {data-navmenu="Paraná"}
+==========================
+```{r PR12, echo=F, fig.pos="H", fig.align='center'}
+#palob <- colorBin("Oranges", domain=branco, na.color="white")
+#palob <- colorNumeric("Oranges", domain=branco, na.color="white")
+branco = ifelse(PRCovid$deaths==0, NA, PRCovid$deaths)
+
+palob <- colorBin(colortools::wheel("steelblue", num=10, border='red'), 
+                 domain=PRCovid$deaths, na.color='lightyellow', bins=10)
+
+state_PRM <- paste0("<strong> Municipio: </strong>", PRCovid$NM_MUNICIP,
+                      "<br><strong> Confirmados: </strong>", PRCovid$confirmed,
+                      "<br><strong> Óbitos: </strong>", PRCovid$deaths) %>% lapply(htmltools::HTML)
+
+PRObitos <- leaflet(data=PRCovid, width=2000, height=1000) %>%
+  addProviderTiles("CartoDB.Positron") %>%
+  addPolygons(fillColor=~palob(branco),
+              fillOpacity=2.5,
+              color = "black",
+              weight=1,
+              label = state_PRM,
+              labelOptions = labelOptions(direction='auto', textsize=16))  %>%
+ addLegend("topright", pal=palob, values=~PRCovid$deaths,
+            title = "Óbitos",
+            opacity = 1)
+
+Obitos <- addControlGPS(PRObitos, options=gpsOptions(position="topleft", activate=TRUE, autoCenter=TRUE, maxZoom=10, setView = TRUE))
+
+activateGPS(Obitos)
+```

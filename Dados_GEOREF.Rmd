@@ -1,0 +1,33 @@
+```{r georef, include=FALSE}
+#------------------------------
+# Dados de georeferenciamento -
+#------------------------------
+#
+# Brasil
+BRA = readOGR('c:/Corona/Brasil/BR/BRUFE250GC_SIR.shp', 
+              encoding="UTF-8", stringsAsFactors=FALSE)
+
+BRA@data$NM_ESTADO <- iconv(BRA@data$NM_ESTADO, from="UTF-8",
+                            to="ISO-8859-1")
+
+
+# Paraná
+PR = readOGR('c:/Corona/Paraná/PR/41MUE250GC_SIR.shp', 
+             encoding="UTF-8", stringsAsFactors=FALSE)
+
+PR@data$NM_MUNICIP <- iconv(PR@data$NM_MUNICIP, from="UTF-8",
+                            to="ISO-8859-1")
+# PR@bbox
+# PR@polygons
+# PR@plotOrder
+# PR@data[1:5, ]
+# PR@class
+
+
+# Londrina
+LON = readOGR('C:/Corona/Londrina/LON/bairros/LIM_Bairros_V1.shp',
+              encoding="UTF-8", stringsAsFactors=FALSE)
+
+LON@data$bairros <- iconv(LON@data$bairros, from="UTF-8", 
+                          to="ISO-8859-1")
+```

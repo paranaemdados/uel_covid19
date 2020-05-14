@@ -1,0 +1,30 @@
+Índice de Desenvolvimento Humano {data-navmenu="IDH"}
+======================================================
+```{r PART1, echo=FALSE}
+Resumo <- gover %>%
+  arrange(-deaths) %>%
+  select(Partido, UF, População_estimada, Casos_Por_Milhão, Obitos_Por_Milhão, Densidade_Demog, IDH)
+
+Resumo[is.na(Resumo)] <- 0
+
+datatable(data = Resumo,
+          rownames = FALSE,
+          colnames = c("Partidos", 
+                       "Estados", 
+                       "População Estimada", 
+                       "Casos (por milhão de hab.)", 
+                       "Óbitos (por milhão de hab.)", 
+                       "Densidade Demográfica (hab/km^2)", 
+                       "IDH"),
+          options = list(
+            columnDefs = list(
+              list(className='dt-right', targets=1:6)),
+            pageLength=nrow(Resumo), dom = 'tip'))
+```
+
+
+<!-- Relações IDH {data-navmenu="IDH"} -->
+<!-- ====================================================== -->
+<!-- ```{r PART2, echo=FALSE} -->
+<!-- with(gover, plot(IDH ~ Casos_Por_Milhão, pch=19, col='red')) -->
+<!-- ``` -->
